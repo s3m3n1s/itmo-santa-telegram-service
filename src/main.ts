@@ -4,6 +4,6 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const bot = await NestFactory.create(AppModule);
-  bot.listen('4040');
+  bot.listen('4020');
 }
 bootstrap();

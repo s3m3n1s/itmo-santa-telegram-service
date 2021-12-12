@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { GiftsModule } from 'gifts/gifts.module';
 import { TelegrafModule } from 'nestjs-telegraf';
 import { NotificationsModule } from 'notifications/notifications.module';
-import { UsersModule } from 'users/users.module';
+import { StartModule } from 'start/start.module';
 import { sessionMiddleware } from './middleware/session.middleware';
 
 require('dotenv').config();
@@ -14,11 +14,10 @@ require('dotenv').config();
       useFactory: () => ({
         token: process.env.BOT_TOKEN,
         middlewares: [sessionMiddleware],
-        include: [GiftsModule, UsersModule, NotificationsModule],
+        include: [GiftsModule, StartModule, NotificationsModule],
       }),
     }),
-    GiftsModule,
-    UsersModule,
+    StartModule,
     NotificationsModule,
   ],
 })
