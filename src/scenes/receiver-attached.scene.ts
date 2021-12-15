@@ -54,32 +54,32 @@ export class ReceiverAttached {
     await ctx.reply(`${codeButtonText} ${8080}`, codeButtonKeyboard);
   }
 
-  @On('callback_query')
-  async onInlineKeyboard(@Ctx() ctx) {
-    const { id, language_code } = ctx.from;
-    const { queryType } = JSON.parse(ctx.update.callback_query.data);
+  // @On('callback_query')
+  // async onInlineKeyboard(@Ctx() ctx) {
+  //   const { id, language_code } = ctx.from;
+  //   const { queryType } = JSON.parse(ctx.update.callback_query.data);
 
-    //перенести в start
-    if (queryType === 'WENT_FOR_GIFT') {
-      await ctx.reply(
-        getTranslation(language_code, this.currentScene, 'REMIND_ABOUT_LETTER'),
-        reminderKeyboard,
-      );
-    }
-    if (queryType === 'WILL_SEND_LETTER') {
-      await ctx.reply('Отправь его ответным сообщением');
-    }
-    if (queryType === 'WONT_SEND_GIFT') {
-      await ctx.reply('Понял принял подтвердил');
-    }
-    if (queryType === 'OKAY') {
-      await ctx.reply('😇');
-    }
+  //   //перенести в start
+  //   if (queryType === 'WENT_FOR_GIFT') {
+  //     await ctx.reply(
+  //       getTranslation(language_code, this.currentScene, 'REMIND_ABOUT_LETTER'),
+  //       reminderKeyboard,
+  //     );
+  //   }
+  //   if (queryType === 'WILL_SEND_LETTER') {
+  //     await ctx.reply('Отправь его ответным сообщением');
+  //   }
+  //   if (queryType === 'WONT_SEND_GIFT') {
+  //     await ctx.reply('Понял принял подтвердил');
+  //   }
+  //   if (queryType === 'OKAY') {
+  //     await ctx.reply('😇');
+  //   }
 
-    if (queryType === GIFT_DELIVERED_SCENE) {
-      await ctx.scene.enter(GIFT_DELIVERED_SCENE);
-    }
-  }
+  //   if (queryType === GIFT_DELIVERED_SCENE) {
+  //     await ctx.scene.enter(GIFT_DELIVERED_SCENE);
+  //   }
+  // }
 
   @On('message')
   async onLetter(@Ctx() ctx) {

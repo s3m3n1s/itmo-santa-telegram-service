@@ -45,4 +45,11 @@ export class CommandHandler {
       parse_mode: 'HTML',
     });
   }
+
+  @Command('author')
+  async getInformationAboutAuthor(@Ctx() ctx) {
+    await ctx.reply(
+      'Instagram: https://www.instagram.com/danyaisyourhomie/\nTelegram: @partnadem',
+    );
+  }
 }

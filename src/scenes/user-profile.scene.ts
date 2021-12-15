@@ -1,5 +1,5 @@
 import { UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
-import { getUserAPI, sendUserBioAPI } from 'api';
+import { getUserAPI, sendUserBioAPI, updateUserProgressAPI } from 'api';
 import {
   BIO_SCENE,
   LETTER_SCENE,
@@ -28,7 +28,7 @@ export class UserProfileScene {
   async onSceneEnter(@Ctx() ctx) {
     const { id } = ctx.from;
     const user = await getUserAPI(id);
-
+    await updateUserProgressAPI(id, USER_PROFILE_SCENE);
     console.log(`Entered ${this.currentScene}`);
 
     if (user?.bio) {

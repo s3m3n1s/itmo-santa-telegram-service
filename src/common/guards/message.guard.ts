@@ -1,7 +1,12 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { getUserAPI } from 'api';
-import { REGISTRATION_SCENE } from 'app.constants';
+import {
+  GIFT_DELIVERED_SCENE,
+  RECEIVER_ATTACHED_SCENE,
+  REGISTRATION_SCENE,
+} from 'app.constants';
 import { sendLetterKeyboard, sendBioKeyboard } from 'keyboards/message';
+import { getTranslation } from 'language';
 
 import {
   TelegrafExecutionContext,
@@ -17,10 +22,9 @@ export class MessageGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = TelegrafExecutionContext.create(context);
     const { scene, from, telegram } = ctx.getContext<Context>();
-    const { id } = from;
+    const { id, language_code } = from;
 
     const user = await getUserAPI(id);
-    console.log(user);
 
     if (!user.tg_id) {
       await telegram.sendMessage(
@@ -31,26 +35,26 @@ export class MessageGuard implements CanActivate {
       return true;
     }
 
-    if (!user.bio) {
+    if (!user.bio && this.canSendBioRequest(user.progress)) {
       await telegram.sendMessage(
         id,
-        'Хотите заполнить информацию о себе для тайного Санты?',
-        sendBioKeyboard('Да', 'Нет'),
+        getTranslation(language_code, 'SUPPORT', 'FILL_BIO'),
+        sendBioKeyboard('✅', '❌'),
       );
       return true;
     }
 
-    if (!user.letter) {
+    if (!user.letter && user.progress === GIFT_DELIVERED_SCENE) {
       await telegram.sendMessage(
         id,
-        'Хотите отправить получателю анонимное письмо?',
-        sendLetterKeyboard('Да', 'Нет'),
+        getTranslation(language_code, 'SUPPORT', 'FILL_LETTER'),
+        sendLetterKeyboard('✅', '❌'),
       );
       return true;
     }
 
     throw new TelegrafException(
-      'Пока дополнительная информация от тебя не требуется',
+      getTranslation(language_code, 'SUPPORT', 'FILL_IDLE'),
     );
 
     return true;
@@ -58,5 +62,16 @@ export class MessageGuard implements CanActivate {
 
   async handleUserProgress(userStatus: string, @Ctx() ctx) {
     console.log(userStatus);
+  }
+
+  canSendBioRequest(progress: string) {
+    switch (progress) {
+      case RECEIVER_ATTACHED_SCENE:
+        return false;
+      case GIFT_DELIVERED_SCENE:
+        return false;
+      default:
+        return true;
+    }
   }
 }

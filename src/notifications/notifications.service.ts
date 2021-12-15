@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { BOT_NAME } from 'app.constants';
+import { getUserAPI, updateUserProgressAPI } from 'api';
+import {
+  BOT_NAME,
+  GIFT_DELIVERED_SCENE,
+  RECEIVER_ATTACHED_SCENE,
+  REGISTRATION_SCENE,
+} from 'app.constants';
 
 import {
   onGiftDeliveredKeyboard,
@@ -35,11 +41,10 @@ export class NotificationsService {
     }
   }
 
-  async onUserAuth({
-    receiverId,
-    language_code = 'ru',
-    username = 'дорогой участник',
-  }) {
+  async onUserAuth({ receiverId, username = 'дорогой участник' }) {
+    await updateUserProgressAPI(receiverId, REGISTRATION_SCENE);
+
+    const language_code = await this.getUserLanguage(receiverId);
     await this.send(
       receiverId,
       getTranslation(language_code, 'USER_PROFILE_SCENE', 'START')(username),
@@ -53,7 +58,9 @@ export class NotificationsService {
     );
   }
 
-  async onReceiverAttach({ receiverId, language_code = 'ru' }) {
+  async onReceiverAttach({ receiverId }) {
+    await updateUserProgressAPI(receiverId, RECEIVER_ATTACHED_SCENE);
+    const language_code = await this.getUserLanguage(receiverId);
     await this.send(
       receiverId,
       getTranslation(language_code, 'RECEIVER_ATTACHED_SCENE', 'START'),
@@ -61,13 +68,15 @@ export class NotificationsService {
         getTranslation(
           language_code,
           'RECEIVER_ATTACHED_SCENE',
-          'READ_LETTER_KEYBOARD',
+          'READ_BIO_KEYBOARD',
         ),
       ),
     );
   }
 
-  async onGiftDeliver({ receiverId, language_code = 'ru' }) {
+  async onGiftDeliver({ receiverId }) {
+    await updateUserProgressAPI(receiverId, GIFT_DELIVERED_SCENE);
+    const language_code = await this.getUserLanguage(receiverId);
     await this.send(
       receiverId,
       getTranslation(language_code, 'GIFT_DELIVERED_SCENE', 'START'),
@@ -75,7 +84,8 @@ export class NotificationsService {
     );
   }
 
-  async onMyGiftReceive({ receiverId, language_code = 'ru' }) {
+  async onMyGiftReceive({ receiverId }) {
+    const language_code = await this.getUserLanguage(receiverId);
     await this.send(
       receiverId,
       getTranslation(
@@ -87,7 +97,8 @@ export class NotificationsService {
     );
   }
 
-  async onGiftReceive({ receiverId, language_code = 'ru' }) {
+  async onGiftReceive({ receiverId }) {
+    const language_code = await this.getUserLanguage(receiverId);
     await this.send(
       receiverId,
       getTranslation(
@@ -95,7 +106,14 @@ export class NotificationsService {
         'GIFT_DELIVERED_SCENE',
         'GIFT_WAS_RECEIVED',
       ),
-      onGiftReceivedKeyboard('Прочитать письмо от тайного Санты'),
+      onGiftReceivedKeyboard('✉️'),
     );
+  }
+
+  async getUserLanguage(userId) {
+    const user = await getUserAPI(userId);
+    if (user) {
+      return user.language_code || 'en';
+    }
   }
 }

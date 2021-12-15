@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { getUserAPI } from 'api';
 import { REGISTRATION_SCENE } from 'app.constants';
+import { getTranslation } from 'language';
 import {
   TelegrafExecutionContext,
   TelegrafException,
@@ -15,13 +16,17 @@ export class TelegramUserRegistered implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = TelegrafExecutionContext.create(context);
     const { scene, from } = ctx.getContext<Context>();
-    const { id } = from;
+    const { id, language_code } = from;
 
     const user = await getUserAPI(id);
 
     if (!user.tg_id) {
       throw new TelegrafException(
-        'Вы не авторизированы в системе. Чтобы использовать бота, необходимо авторизироваться. Введите команду /start',
+        getTranslation(
+          language_code,
+          REGISTRATION_SCENE,
+          'USER_NOT_REGISTERED',
+        ),
       );
     }
 

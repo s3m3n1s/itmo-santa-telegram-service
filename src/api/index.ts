@@ -1,23 +1,14 @@
 import axios from 'axios';
 
-export const getUserAPI = async (id: string | number) => {
+export const getUserAPI = async (userId: string | number) => {
   try {
     const res = await axios.get(
-      `${process.env.REST_API}/users/getBy/tg_id/${id}`,
+      `${process.env.REST_API}/users/getBy/tg_id/${userId}`,
     );
+    console.log('запрошена информация о юзере ', userId);
     return res.data;
   } catch (err) {
-    console.log(err);
-    return err.response.data;
-  }
-};
-
-export const authUserAPI = async (id: string) => {
-  try {
-    const res = await axios.get(`${process.env.REST_API}/users/auth/${id}`);
-    return res.data;
-  } catch (err) {
-    console.log(err);
+    console.log(userId, err.response?.data);
     return err.response.data;
   }
 };
@@ -31,9 +22,10 @@ export const sendUserBioAPI = async (userId: string, bio: string) => {
       },
     );
 
+    console.log(userId, ' заполнил информацию о себе');
     return res.data;
   } catch (err) {
-    console.log(err);
+    console.log(userId, err.response?.data);
     return err.response.data;
   }
 };
@@ -48,9 +40,10 @@ export const getUserBioAPI = async (userId: string) => {
       `${process.env.REST_API}/users/get/${gift.data.creatorId}/`,
     );
     const bio = users.data.bio;
+    console.log(userId, 'получил пожелания от своего получателя');
     return bio;
   } catch (err) {
-    console.log(err);
+    console.log(userId, err.response?.data);
     return err.response.data;
   }
 };
@@ -66,9 +59,32 @@ export const sendUserLetterAPI = async (
         letter,
       },
     );
+
+    console.log(giftCreatorId, ' отправил письмо ');
     return res.data;
   } catch (err) {
-    console.log(err);
+    console.log(giftCreatorId, err.response?.data);
+    return err.response.data;
+  }
+};
+
+export const updateUserProgressAPI = async (
+  userId: string,
+  progress: string,
+) => {
+  try {
+    const res = await axios.patch(
+      `${process.env.REST_API}/users/update/${userId}/`,
+      {
+        progress,
+      },
+    );
+
+    console.log(userId, ' перешёл на этап: ', progress);
+
+    return res.data;
+  } catch (err) {
+    console.log(userId, err.response?.data);
     return err.response.data;
   }
 };

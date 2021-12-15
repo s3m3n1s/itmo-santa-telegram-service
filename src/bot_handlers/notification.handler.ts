@@ -26,7 +26,7 @@ export class NotificationHandler {
   async onGiftReceived(@Ctx() ctx) {
     const { id } = ctx.from;
 
-    await ctx.reply('Смотри подарок и читай письмо!!');
+    await ctx.reply('user letter');
   }
   async onMyGiftReceived(@Ctx() ctx) {
     const { id } = ctx.from;

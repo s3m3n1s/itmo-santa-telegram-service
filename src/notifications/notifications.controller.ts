@@ -14,6 +14,8 @@ export class NotificationsController {
 
   @Post('/REGISTRATION')
   async onUserAuth(@Body() data) {
+    console.log(data);
+
     return this.notificationService.onUserAuth(data);
   }
 

@@ -1,5 +1,4 @@
 import { UseFilters, UseInterceptors } from '@nestjs/common';
-import { authUserAPI } from 'api';
 import { REGISTRATION_SCENE, USER_PROFILE_SCENE } from 'app.constants';
 import { TelegrafExceptionFilter } from 'common/filters/telegraf-exception.filter';
 import { ResponseTimeInterceptor } from 'common/interceptors/response-time.interceptor';
@@ -24,6 +23,9 @@ export class RegistrationScene {
   async onSceneEnter(@Ctx() ctx) {
     const { language_code } = ctx.from;
     await ctx.reply(
+      `Язык по умолчанию: ${language_code}\nDefault language: ${language_code}`,
+    );
+    await ctx.reply(
       getTranslation(language_code, this.currentScene, 'START'),
       aboutLanguageKeyboard({
         text: getTranslation(
@@ -36,9 +38,10 @@ export class RegistrationScene {
   }
 
   async authorization(@Ctx() ctx) {
-    const { id, language_code, first_name, last_name, username } = ctx.from;
+    const { id, language_code } = ctx.from;
     const token = await generateAuthToken({
       tg_id: id,
+      language_code,
     });
     const url = `${process.env.LINK_TO_REGISTRATION}&state=${token}`;
     await ctx.reply(
