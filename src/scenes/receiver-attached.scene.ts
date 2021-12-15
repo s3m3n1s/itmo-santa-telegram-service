@@ -11,6 +11,7 @@ import {
 } from 'keyboards/receiver-attached';
 import { getTranslation, lang } from 'language';
 import { Ctx, On, Scene, SceneEnter } from 'nestjs-telegraf';
+import { getUserLanguage } from 'utils';
 
 @UseInterceptors(ResponseTimeInterceptor)
 @UseFilters(TelegrafExceptionFilter)
@@ -22,7 +23,8 @@ export class ReceiverAttached {
   }
   @SceneEnter()
   async onSceneEnter(@Ctx() ctx) {
-    const { language_code, id } = ctx.from;
+    const { id } = ctx.from;
+    const language_code = await getUserLanguage(id);
 
     const letter = await getUserBioAPI(id);
 
@@ -83,13 +85,15 @@ export class ReceiverAttached {
 
   @On('message')
   async onLetter(@Ctx() ctx) {
-    const { id, language_code } = ctx.from;
+    const { id } = ctx.from;
+    const language_code = await getUserLanguage(id);
     //Проверка, что подарок был доставлен
     await ctx.reply('Сохранил');
   }
 
   async remindAboutLetter(@Ctx() ctx) {
-    const { id, language_code } = ctx.from;
+    const { id } = ctx.from;
+    const language_code = await getUserLanguage(id);
     await ctx.reply(
       'Как я и говорил ранее, ты можешь дополнить подарок digital-посланием! Участник получит твое послание, когда заберет предназначенный ему подарок.',
       sendLetterKeyboard,

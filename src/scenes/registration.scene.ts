@@ -8,7 +8,7 @@ import {
 } from 'keyboards/registration';
 import { getTranslation } from 'language';
 import { Ctx, On, Scene, SceneEnter } from 'nestjs-telegraf';
-import { generateAuthToken } from 'utils';
+import { generateAuthToken, getUserLanguage } from 'utils';
 
 @UseInterceptors(ResponseTimeInterceptor)
 @UseFilters(TelegrafExceptionFilter)
@@ -21,51 +21,43 @@ export class RegistrationScene {
 
   @SceneEnter()
   async onSceneEnter(@Ctx() ctx) {
-    const { language_code } = ctx.from;
+    const { id, language_code } = ctx.from;
+
     await ctx.reply(
       `Язык по умолчанию: ${language_code}\nDefault language: ${language_code}`,
     );
     await ctx.reply(
       getTranslation(language_code, this.currentScene, 'START'),
-      aboutLanguageKeyboard({
-        text: getTranslation(
-          language_code,
-          this.currentScene,
-          'START_KEYBOARD',
-        ),
-      }),
+      aboutLanguageKeyboard,
     );
   }
 
-  async authorization(@Ctx() ctx) {
-    const { id, language_code } = ctx.from;
+  async authorization(@Ctx() ctx, lang: string) {
+    const { id } = ctx.from;
     const token = await generateAuthToken({
       tg_id: id,
-      language_code,
+      lang,
     });
+
     const url = `${process.env.LINK_TO_REGISTRATION}&state=${token}`;
     await ctx.reply(
-      getTranslation(language_code, this.currentScene, 'AUTH_PHRASE'),
+      getTranslation(lang, this.currentScene, 'AUTH_PHRASE'),
       authLinkKeyboard({
         url,
-        text: getTranslation(
-          language_code,
-          this.currentScene,
-          'AUTH_PHRASE_KEYBOARD',
-        ),
+        text: getTranslation(lang, this.currentScene, 'AUTH_PHRASE_KEYBOARD'),
       }),
     );
   }
 
   @On('callback_query')
   async onInlineKeyboard(@Ctx() ctx) {
-    const { queryType } = JSON.parse(ctx.update.callback_query.data);
+    const { queryType, lang } = JSON.parse(ctx.update.callback_query.data);
 
     if (queryType === USER_PROFILE_SCENE) {
       await ctx.scene.enter(USER_PROFILE_SCENE);
     }
     if (queryType === 'ABOUT_LANGUAGE') {
-      await this.authorization(ctx);
+      await this.authorization(ctx, lang);
     }
   }
 }

@@ -17,6 +17,7 @@ import {
 import { getTranslation, lang } from 'language';
 import { InjectBot } from 'nestjs-telegraf';
 import { Context, Telegraf } from 'telegraf';
+import { getUserLanguage } from 'utils';
 
 @Injectable()
 export class NotificationsService {
@@ -44,7 +45,7 @@ export class NotificationsService {
   async onUserAuth({ receiverId, username = 'дорогой участник' }) {
     await updateUserProgressAPI(receiverId, REGISTRATION_SCENE);
 
-    const language_code = await this.getUserLanguage(receiverId);
+    const language_code = await getUserLanguage(receiverId);
     await this.send(
       receiverId,
       getTranslation(language_code, 'USER_PROFILE_SCENE', 'START')(username),
@@ -60,7 +61,7 @@ export class NotificationsService {
 
   async onReceiverAttach({ receiverId }) {
     await updateUserProgressAPI(receiverId, RECEIVER_ATTACHED_SCENE);
-    const language_code = await this.getUserLanguage(receiverId);
+    const language_code = await getUserLanguage(receiverId);
     await this.send(
       receiverId,
       getTranslation(language_code, 'RECEIVER_ATTACHED_SCENE', 'START'),
@@ -76,7 +77,7 @@ export class NotificationsService {
 
   async onGiftDeliver({ receiverId }) {
     await updateUserProgressAPI(receiverId, GIFT_DELIVERED_SCENE);
-    const language_code = await this.getUserLanguage(receiverId);
+    const language_code = await getUserLanguage(receiverId);
     await this.send(
       receiverId,
       getTranslation(language_code, 'GIFT_DELIVERED_SCENE', 'START'),
@@ -85,7 +86,7 @@ export class NotificationsService {
   }
 
   async onMyGiftReceive({ receiverId }) {
-    const language_code = await this.getUserLanguage(receiverId);
+    const language_code = await getUserLanguage(receiverId);
     await this.send(
       receiverId,
       getTranslation(
@@ -98,7 +99,7 @@ export class NotificationsService {
   }
 
   async onGiftReceive({ receiverId }) {
-    const language_code = await this.getUserLanguage(receiverId);
+    const language_code = await getUserLanguage(receiverId);
     await this.send(
       receiverId,
       getTranslation(
@@ -108,12 +109,5 @@ export class NotificationsService {
       ),
       onGiftReceivedKeyboard('✉️'),
     );
-  }
-
-  async getUserLanguage(userId) {
-    const user = await getUserAPI(userId);
-    if (user) {
-      return user.language_code || 'en';
-    }
   }
 }

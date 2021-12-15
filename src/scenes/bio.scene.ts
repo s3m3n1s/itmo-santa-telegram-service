@@ -7,6 +7,7 @@ import { ResponseTimeInterceptor } from 'common/interceptors/response-time.inter
 import { getTranslation, lang } from 'language';
 
 import { Ctx, On, Scene, SceneEnter } from 'nestjs-telegraf';
+import { getUserLanguage } from 'utils';
 
 @UseInterceptors(ResponseTimeInterceptor)
 @Scene(BIO_SCENE)
@@ -20,7 +21,8 @@ export class BioScene {
   @SceneEnter()
   @UseGuards(BioGuard)
   async onSceneEnter(@Ctx() ctx) {
-    const { language_code } = ctx.from;
+    const { id } = ctx.from;
+    const language_code = await getUserLanguage(id);
     await ctx.reply(
       getTranslation(language_code, USER_PROFILE_SCENE, 'TELL_ABOUT_YOURSELF'),
     );
@@ -28,7 +30,8 @@ export class BioScene {
 
   @On('message')
   async sendBio(@Ctx() ctx) {
-    const { id, language_code } = ctx.from;
+    const { id } = ctx.from;
+    const language_code = await getUserLanguage(id);
     const { text } = ctx.update.message;
     const user = await getUserAPI(id);
     await sendUserBioAPI(id, text);

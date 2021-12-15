@@ -13,6 +13,7 @@ import {
   TelegrafException,
   Ctx,
 } from 'nestjs-telegraf';
+import { getUserLanguage } from 'utils';
 import { Context } from '../../interfaces/context.interface';
 
 @Injectable()
@@ -22,7 +23,8 @@ export class MessageGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = TelegrafExecutionContext.create(context);
     const { scene, from, telegram } = ctx.getContext<Context>();
-    const { id, language_code } = from;
+    const { id } = from;
+    const language_code = await getUserLanguage(id);
 
     const user = await getUserAPI(id);
 

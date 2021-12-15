@@ -13,6 +13,7 @@ import { ResponseTimeInterceptor } from 'common/interceptors/response-time.inter
 import { getTranslation } from 'language';
 
 import { Ctx, On, Scene, SceneEnter } from 'nestjs-telegraf';
+import { getUserLanguage } from 'utils';
 
 @Scene(LETTER_SCENE)
 @UseFilters(TelegrafExceptionFilter)
@@ -34,7 +35,8 @@ export class LetterScene {
   }
 
   async fillUserBio(@Ctx() ctx) {
-    const { language_code } = ctx.from;
+    const { id } = ctx.from;
+    const language_code = await getUserLanguage(id);
     await ctx.reply(
       getTranslation(language_code, this.currentScene, 'SEND_LETTER'),
     );
@@ -43,6 +45,7 @@ export class LetterScene {
   @On('message')
   async sendBio(@Ctx() ctx) {
     const { id } = ctx.from;
+    const language_code = await getUserLanguage(id);
     const { text } = ctx.update.message;
     await sendUserLetterAPI(id, text);
     await ctx.reply('Отправил!');

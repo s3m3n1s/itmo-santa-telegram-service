@@ -1,14 +1,24 @@
 import { USER_PROFILE_SCENE } from 'app.constants';
 import { Keyboard } from 'telegram-keyboard';
 
-export const aboutLanguageKeyboard = ({ text }) =>
-  Keyboard.make([
-    {
-      text,
-      type: 'button',
-      callback_data: JSON.stringify({ queryType: 'ABOUT_LANGUAGE' }),
-    },
-  ]).inline();
+export const aboutLanguageKeyboard = Keyboard.make([
+  {
+    text: '🇷🇺',
+    type: 'button',
+    callback_data: JSON.stringify({
+      queryType: 'ABOUT_LANGUAGE',
+      lang: 'ru',
+    }),
+  },
+  {
+    text: '🇬🇧',
+    type: 'button',
+    callback_data: JSON.stringify({
+      queryType: 'ABOUT_LANGUAGE',
+      lang: 'en',
+    }),
+  },
+]).inline();
 
 export const authLinkKeyboard = ({ url, text }) =>
   Keyboard.make([

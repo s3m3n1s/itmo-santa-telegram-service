@@ -1,3 +1,5 @@
+import { getUserAPI } from 'api';
+
 const jwt = require('jsonwebtoken');
 
 export const generateAuthToken = async (payload) => {
@@ -5,6 +7,13 @@ export const generateAuthToken = async (payload) => {
     expiresIn: '60s',
   });
   return token;
+};
+
+export const getUserLanguage = async (userId) => {
+  const user = await getUserAPI(userId);
+  if (user) {
+    return user.language_code || 'en';
+  }
 };
 
 export const encodeMessageTypeToEmoji = (type: string) => {

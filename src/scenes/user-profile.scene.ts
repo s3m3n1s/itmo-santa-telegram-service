@@ -13,6 +13,7 @@ import { ResponseTimeInterceptor } from 'common/interceptors/response-time.inter
 import { instructionsKeyboard, waitKeyboard } from 'keyboards/user-profile';
 import { getTranslation, lang } from 'language';
 import { Ctx, On, Scene, SceneEnter } from 'nestjs-telegraf';
+import { getUserLanguage } from 'utils';
 
 @UseGuards(TelegramUserRegistered)
 @UseInterceptors(ResponseTimeInterceptor)
@@ -39,14 +40,17 @@ export class UserProfileScene {
   }
 
   async fillUserBio(@Ctx() ctx) {
-    const { language_code } = ctx.from;
+    const { id } = ctx.from;
+    const language_code = await getUserLanguage(id);
     await ctx.reply(
       getTranslation(language_code, this.currentScene, 'TELL_ABOUT_YOURSELF'),
     );
   }
 
   async waitForReceiverInstructions(@Ctx() ctx) {
-    const { language_code } = ctx.from;
+    const { id } = ctx.from;
+    const language_code = await getUserLanguage(id);
+
     const currentScene = USER_PROFILE_SCENE;
     await ctx.reply(
       getTranslation(language_code, currentScene, 'WAIT'),
@@ -74,7 +78,8 @@ export class UserProfileScene {
 
   async getInstructions(@Ctx() ctx) {
     const currentScene = USER_PROFILE_SCENE;
-    const { language_code } = ctx.from;
+    const { id } = ctx.from;
+    const language_code = await getUserLanguage(id);
     const INSTRUCTIONS = getTranslation(
       language_code,
       currentScene,
