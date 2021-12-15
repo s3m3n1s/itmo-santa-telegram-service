@@ -9,7 +9,7 @@ import {
 } from 'keyboards/registration';
 import { getTranslation } from 'language';
 import { Ctx, On, Scene, SceneEnter } from 'nestjs-telegraf';
-import { generateAuthLink } from 'utils';
+import { generateAuthToken } from 'utils';
 
 @UseInterceptors(ResponseTimeInterceptor)
 @UseFilters(TelegrafExceptionFilter)
@@ -37,11 +37,10 @@ export class RegistrationScene {
 
   async authorization(@Ctx() ctx) {
     const { id, language_code, first_name, last_name, username } = ctx.from;
-    const token = await generateAuthLink({
-      tgId: id,
-      language_code,
+    const token = await generateAuthToken({
+      tg_id: id,
     });
-    const url = `${process.env.LINK_TO_REGISTRATION}&state=${id}`;
+    const url = `${process.env.LINK_TO_REGISTRATION}&state=${token}`;
     await ctx.reply(
       getTranslation(language_code, this.currentScene, 'AUTH_PHRASE'),
       authLinkKeyboard({
