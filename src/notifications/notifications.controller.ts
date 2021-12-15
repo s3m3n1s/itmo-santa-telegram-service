@@ -12,23 +12,28 @@ export class NotificationsController {
     return this.notificationService.send(data.receiverId, data.message, null);
   }
 
-  @Post('/registration')
+  @Post('/REGISTRATION')
   async onUserAuth(@Body() data) {
     return this.notificationService.onUserAuth(data);
   }
 
-  @Post('/receiver_attached')
+  @Post('/RECEIVER_ATTACHED')
   async onReceiverAttach(@Body() data) {
     return this.notificationService.onReceiverAttach(data);
   }
 
-  @Post('/gift_delivered')
+  @Post('/GIFT_DELIVERED')
   async onGiftDeliver(@Body() data) {
     return this.notificationService.onGiftDeliver(data);
   }
 
-  @Post('/incoming_letter')
-  async onIncomingLetter(@Body() data) {
-    return this.notificationService.onIncomingLetter(data);
+  @Post('/GIFT_RECEIVED')
+  async onGiftReceive(@Body() data) {
+    return this.notificationService.onGiftReceive(data);
+  }
+
+  @Post('/MY_GIFT_RECEIVED')
+  async onGiftTake(@Body() data) {
+    return this.notificationService.onMyGiftReceive(data);
   }
 }

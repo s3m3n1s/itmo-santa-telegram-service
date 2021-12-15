@@ -1,51 +1,38 @@
 import { Injectable } from '@nestjs/common';
-import { GreeterBotName } from 'app.constants';
+import { BOT_NAME } from 'app.constants';
+
 import {
-  readLetterKeyboard,
-  visitDeliverPlaceKeyboard,
-} from 'keyboards/gift-delivered';
-import { readReceiverBioKeyboard } from 'keyboards/receiver-attached';
-import { onRegistrationKeyboard } from 'keyboards/registration';
+  onGiftDeliveredKeyboard,
+  onGiftReceivedKeyboard,
+  onMyGiftReceivedKeyboard,
+  onReceivedAttachedKeyboard,
+  onRegistrationKeyboard,
+} from 'keyboards/notify';
 import { getTranslation, lang } from 'language';
 import { InjectBot } from 'nestjs-telegraf';
-import { RegistrationScene } from 'scenes/registration.scene';
 import { Context, Telegraf } from 'telegraf';
-import { encodeMessageTypeToEmoji } from 'utils';
 
 @Injectable()
 export class NotificationsService {
   constructor(
-    @InjectBot(GreeterBotName)
+    @InjectBot(BOT_NAME)
     private readonly bot: Telegraf<Context>,
-    private readonly registrationScene: RegistrationScene,
   ) {}
 
-  // async sendNotification(data) {
-  //   this.bot.telegram.sendChatAction(data.receiverId, 'typing');
-  //   if (data.title) {
-  //     this.bot.telegram.sendMessage(
-  //       data.receiverId,
-  //       `<b>${encodeMessageTypeToEmoji(data.type)} ${data.title}</b>\n${
-  //         data.message
-  //       }`,
-  //       {
-  //         reply_markup: readReceiverBio.reply_markup,
-  //         parse_mode: 'HTML',
-  //       },
-  //     );
-  //   } else {
-  //     this.bot.telegram.sendMessage(data.receiverId, `${data.message}`, {
-  //       reply_markup: readReceiverBio.reply_markup,
-  //       parse_mode: 'HTML',
-  //     });
-  //   }
-  // }
+  async send(receiver, message, keyboard?) {
+    try {
+      await this.bot.telegram.sendMessage(receiver, `${message}`, {
+        reply_markup: keyboard?.reply_markup,
+        parse_mode: 'HTML',
+      });
+    } catch (err) {
+      console.log(err);
 
-  async send(receiver, message, keyboard) {
-    await this.bot.telegram.sendMessage(receiver, `${message}`, {
-      reply_markup: keyboard?.reply_markup,
-      parse_mode: 'HTML',
-    });
+      await this.bot.telegram.sendMessage(
+        receiver,
+        'Не удалось отправить сообщение с сервера.',
+      );
+    }
   }
 
   async onUserAuth({
@@ -70,7 +57,7 @@ export class NotificationsService {
     await this.send(
       receiverId,
       getTranslation(language_code, 'RECEIVER_ATTACHED_SCENE', 'START'),
-      readReceiverBioKeyboard(
+      onReceivedAttachedKeyboard(
         getTranslation(
           language_code,
           'RECEIVER_ATTACHED_SCENE',
@@ -83,20 +70,32 @@ export class NotificationsService {
   async onGiftDeliver({ receiverId, language_code = 'ru' }) {
     await this.send(
       receiverId,
-      getTranslation(
-        language_code,
-        'REGISTRATION_SCENE',
-        'AUTH_PHRASE_KEYBOARD',
-      ),
-      visitDeliverPlaceKeyboard,
+      getTranslation(language_code, 'GIFT_DELIVERED_SCENE', 'START'),
+      onGiftDeliveredKeyboard('🎁'),
     );
   }
 
-  async onIncomingLetter({ receiverId, language_code = 'ru' }) {
+  async onMyGiftReceive({ receiverId, language_code = 'ru' }) {
     await this.send(
       receiverId,
-      lang[language_code].REGISTRATION.AUTH_PHRASE_KEYBOARD,
-      readLetterKeyboard,
+      getTranslation(
+        language_code,
+        'GIFT_DELIVERED_SCENE',
+        'MY_GIFT_WAS_RECEIVED',
+      ),
+      onMyGiftReceivedKeyboard('✨'),
+    );
+  }
+
+  async onGiftReceive({ receiverId, language_code = 'ru' }) {
+    await this.send(
+      receiverId,
+      getTranslation(
+        language_code,
+        'GIFT_DELIVERED_SCENE',
+        'GIFT_WAS_RECEIVED',
+      ),
+      onGiftReceivedKeyboard('Прочитать письмо от тайного Санты'),
     );
   }
 }

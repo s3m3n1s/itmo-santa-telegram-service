@@ -5,14 +5,14 @@ import { Context } from '../interfaces/context.interface';
 import { ResponseTimeInterceptor } from '../common/interceptors/response-time.interceptor';
 import { TelegrafExceptionFilter } from '../common/filters/telegraf-exception.filter';
 import { GiftsService } from './gifts.service';
-import { GreeterBotName } from 'app.constants';
+import { BOT_NAME } from 'app.constants';
 import { translateDeliverStatus } from 'utils';
 
 @Update()
 @UseFilters(TelegrafExceptionFilter)
 export class GiftsUpdate {
   constructor(
-    @InjectBot(GreeterBotName)
+    @InjectBot(BOT_NAME)
     private readonly bot: Telegraf<Context>,
     private readonly giftsService: GiftsService,
   ) {}

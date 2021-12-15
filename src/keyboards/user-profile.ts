@@ -41,3 +41,12 @@ export const waitKeyboard = (text1, text2, text3) =>
       },
     ],
   ]).inline();
+
+export const sendBioKeyboard = (text) =>
+  Keyboard.make([
+    {
+      text,
+      type: 'button',
+      callback_data: JSON.stringify({ queryType: 'SEND_BIO' }),
+    },
+  ]).inline();

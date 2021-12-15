@@ -24,6 +24,8 @@ export const onRegistrationKeyboard = (text) =>
     {
       text,
       type: 'button',
-      callback_data: JSON.stringify({ queryType: USER_PROFILE_SCENE }),
+      callback_data: JSON.stringify({
+        queryType: USER_PROFILE_SCENE,
+      }),
     },
   ]).inline();

@@ -1,4 +1,8 @@
+import { UseFilters, UseInterceptors } from '@nestjs/common';
+import { authUserAPI } from 'api';
 import { REGISTRATION_SCENE, USER_PROFILE_SCENE } from 'app.constants';
+import { TelegrafExceptionFilter } from 'common/filters/telegraf-exception.filter';
+import { ResponseTimeInterceptor } from 'common/interceptors/response-time.interceptor';
 import {
   aboutLanguageKeyboard,
   authLinkKeyboard,
@@ -7,6 +11,8 @@ import { getTranslation } from 'language';
 import { Ctx, On, Scene, SceneEnter } from 'nestjs-telegraf';
 import { generateAuthLink } from 'utils';
 
+@UseInterceptors(ResponseTimeInterceptor)
+@UseFilters(TelegrafExceptionFilter)
 @Scene(REGISTRATION_SCENE)
 export class RegistrationScene {
   currentScene: string;
@@ -35,7 +41,7 @@ export class RegistrationScene {
       tgId: id,
       language_code,
     });
-    const url = `https://itmo.ru/?q=${token}`;
+    const url = `${process.env.LINK_TO_REGISTRATION}&state=${id}`;
     await ctx.reply(
       getTranslation(language_code, this.currentScene, 'AUTH_PHRASE'),
       authLinkKeyboard({
@@ -52,7 +58,6 @@ export class RegistrationScene {
   @On('callback_query')
   async onInlineKeyboard(@Ctx() ctx) {
     const { queryType } = JSON.parse(ctx.update.callback_query.data);
-    console.log(queryType);
 
     if (queryType === USER_PROFILE_SCENE) {
       await ctx.scene.enter(USER_PROFILE_SCENE);

@@ -6,7 +6,9 @@ export const readReceiverBioKeyboard = (text) =>
     {
       text,
       type: 'button',
-      callback_data: JSON.stringify({ queryType: RECEIVER_ATTACHED_SCENE }),
+      callback_data: JSON.stringify({
+        queryType: RECEIVER_ATTACHED_SCENE,
+      }),
     },
   ]).inline();
 export const receiverAttachedKeyboard = (text) =>

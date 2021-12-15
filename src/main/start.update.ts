@@ -29,11 +29,35 @@ export class StartUpdate {
 
   @On('callback_query')
   async onMessage(@Ctx() ctx) {
-    const { queryType } = JSON.parse(ctx.update.callback_query.data);
+    const { queryType, enterScene } = JSON.parse(
+      ctx.update.callback_query.data,
+    );
 
-    if (queryType === 'GET_RECEIVER_BIO') {
+    console.log(queryType);
+
+    if (
+      queryType === 'GET_RECEIVER_BIO' ||
+      queryType === RECEIVER_ATTACHED_SCENE
+    ) {
       ctx.scene.enter(RECEIVER_ATTACHED_SCENE);
     }
+    if (queryType === REGISTRATION_SCENE) {
+      ctx.scene.enter(REGISTRATION_SCENE);
+    }
+    if (queryType === USER_PROFILE_SCENE) {
+      ctx.scene.enter(USER_PROFILE_SCENE);
+    }
+    if (queryType === GIFT_DELIVERED_SCENE) {
+      ctx.scene.enter(GIFT_DELIVERED_SCENE);
+    }
+
+    if (enterScene) {
+      await this.handleSceneEnter(ctx, enterScene);
+    }
+  }
+
+  async handleSceneEnter(@Ctx() ctx, sceneName) {
+    await ctx.scene.enter(sceneName);
   }
 
   async handleSceneSelect(@Ctx() ctx, scene: string) {

@@ -1,4 +1,9 @@
+import { UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
+import { getUserBioAPI } from 'api';
 import { GIFT_DELIVERED_SCENE, RECEIVER_ATTACHED_SCENE } from 'app.constants';
+import { TelegrafExceptionFilter } from 'common/filters/telegraf-exception.filter';
+import { TelegramUserRegistered } from 'common/guards/user-exists.guard';
+import { ResponseTimeInterceptor } from 'common/interceptors/response-time.interceptor';
 import {
   receiverAttachedKeyboard,
   reminderKeyboard,
@@ -7,6 +12,8 @@ import {
 import { getTranslation, lang } from 'language';
 import { Ctx, On, Scene, SceneEnter } from 'nestjs-telegraf';
 
+@UseInterceptors(ResponseTimeInterceptor)
+@UseFilters(TelegrafExceptionFilter)
 @Scene(RECEIVER_ATTACHED_SCENE)
 export class ReceiverAttached {
   currentScene: string;
@@ -15,27 +22,36 @@ export class ReceiverAttached {
   }
   @SceneEnter()
   async onSceneEnter(@Ctx() ctx) {
-    const { language_code } = ctx.from;
-    const l = lang[language_code].RECEIVER_ATTACHED;
-    const { INSTRUCTIONS } = getTranslation(
+    const { language_code, id } = ctx.from;
+
+    const letter = await getUserBioAPI(id);
+
+    await ctx.reply(`"${letter}"`);
+
+    const INSTRUCTIONS = getTranslation(
       language_code,
       this.currentScene,
       'INSTRUCTIONS',
     );
+
     for await (const INSTRUCTION of INSTRUCTIONS) {
       await ctx.reply(INSTRUCTION);
     }
-    await ctx.reply(8080);
-    await ctx.reply(
-      getTranslation(language_code, this.currentScene, 'FINAL_INSTRUCTIONS'),
-      receiverAttachedKeyboard(
-        getTranslation(
-          language_code,
-          this.currentScene,
-          'FINAL_INSTRUCTIONS_KEYBOARD',
-        ),
+
+    const codeButtonText = getTranslation(
+      language_code,
+      this.currentScene,
+      'FINAL_INSTRUCTION',
+    );
+    const codeButtonKeyboard = receiverAttachedKeyboard(
+      getTranslation(
+        language_code,
+        this.currentScene,
+        'FINAL_INSTRUCTION_KEYBOARD',
       ),
     );
+
+    await ctx.reply(`${codeButtonText} ${8080}`, codeButtonKeyboard);
   }
 
   @On('callback_query')
@@ -46,7 +62,7 @@ export class ReceiverAttached {
     //перенести в start
     if (queryType === 'WENT_FOR_GIFT') {
       await ctx.reply(
-        'Кстати! Совсем забыл сказать. После того, как доставишь подарок на Ломоносова 9, ты сможешь отправить письмо получателю подарка. Так что можешь начать думать, какие красивые слова напишешь.',
+        getTranslation(language_code, this.currentScene, 'REMIND_ABOUT_LETTER'),
         reminderKeyboard,
       );
     }

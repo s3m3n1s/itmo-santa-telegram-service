@@ -1,7 +1,17 @@
-import { GIFT_DELIVERED_SCENE } from 'app.constants';
-import { visitDeliverPlaceKeyboard } from 'keyboards/gift-delivered';
+import { UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
+import { sendUserLetterAPI } from 'api';
+import { FINAL_SCENE, GIFT_DELIVERED_SCENE } from 'app.constants';
+import { TelegrafExceptionFilter } from 'common/filters/telegraf-exception.filter';
+import { TelegramUserRegistered } from 'common/guards/user-exists.guard';
+import { ResponseTimeInterceptor } from 'common/interceptors/response-time.interceptor';
+import {
+  sendLetterKeyboard,
+  visitDeliverPlaceKeyboard,
+} from 'keyboards/gift-delivered';
+import { getTranslation } from 'language';
 import { Ctx, On, Scene, SceneEnter } from 'nestjs-telegraf';
-
+@UseInterceptors(ResponseTimeInterceptor)
+@UseFilters(TelegrafExceptionFilter)
 @Scene(GIFT_DELIVERED_SCENE)
 export class GiftDelivered {
   currentScene: string;
@@ -10,20 +20,34 @@ export class GiftDelivered {
   }
   @SceneEnter()
   async onSceneEnter(@Ctx() ctx) {
-    const { id, language_code } = ctx.from;
+    await ctx.reply('🥳');
+    this.sendLetter(ctx);
+  }
+
+  async sendLetter(@Ctx() ctx) {
     await ctx.reply(
-      'Хо-хо-хо, и снова привет, мой дорогой Тайный Санта! Настал самый приятный этап этой недели — период получения подарков. Твой подарок уже ждет тебя! Индивидуальный код для его получения — ******. Приходи в BIBLA ITMO на ул. Ломоносова, 9 (пятый этаж, ауд. 1505), 23 и 24 декабря с 9:00 до 21:00, называй эльфам индивидуальный код подарка для тебя и забирай свой кусочек новогоднего настроения.',
-      visitDeliverPlaceKeyboard,
+      'Если хочешь отправить письмо получателю подарка - напиши его в ответном сообщении. Если нет - нажми на кнопку.',
+      sendLetterKeyboard,
+    );
+  }
+
+  @On('message')
+  async onLetter(@Ctx() ctx) {
+    const { id } = ctx.from;
+    const { text } = ctx.update.message;
+
+    await sendUserLetterAPI(id, text);
+    await ctx.reply(
+      'Отправил! Если хочешь его обновить - напиши в чат новую версию. Если нет - нажми на кнопку.',
+      sendLetterKeyboard,
     );
   }
 
   @On('callback_query')
   async onInlineKeyboard(@Ctx() ctx) {
-    const { id, language_code } = ctx.from;
     const { queryType } = JSON.parse(ctx.update.callback_query.data);
-
-    if (queryType === 'WENT_FOR_GIFT') {
-      await ctx.reply('🥳');
+    if (queryType === 'WONT_SEND_LETTER') {
+      await ctx.scene.enter(FINAL_SCENE);
     }
   }
 }

@@ -1,18 +1,41 @@
-import { sendUserBioAPI } from 'api';
-import { RECEIVER_ATTACHED_SCENE, USER_PROFILE_SCENE } from 'app.constants';
+import { UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
+import { getUserAPI, sendUserBioAPI } from 'api';
+import {
+  BIO_SCENE,
+  LETTER_SCENE,
+  RECEIVER_ATTACHED_SCENE,
+  USER_PROFILE_SCENE,
+} from 'app.constants';
+import { ManagerHandler } from 'bot_handlers/manager.handler';
+import { TelegrafExceptionFilter } from 'common/filters/telegraf-exception.filter';
+import { TelegramUserRegistered } from 'common/guards/user-exists.guard';
+import { ResponseTimeInterceptor } from 'common/interceptors/response-time.interceptor';
 import { instructionsKeyboard, waitKeyboard } from 'keyboards/user-profile';
 import { getTranslation, lang } from 'language';
 import { Ctx, On, Scene, SceneEnter } from 'nestjs-telegraf';
 
+@UseGuards(TelegramUserRegistered)
+@UseInterceptors(ResponseTimeInterceptor)
+@UseFilters(TelegrafExceptionFilter)
 @Scene(USER_PROFILE_SCENE)
 export class UserProfileScene {
   currentScene: string;
   constructor() {
     this.currentScene = USER_PROFILE_SCENE;
   }
+
   @SceneEnter()
   async onSceneEnter(@Ctx() ctx) {
-    await this.fillUserBio(ctx);
+    const { id } = ctx.from;
+    const user = await getUserAPI(id);
+
+    console.log(`Entered ${this.currentScene}`);
+
+    if (user?.bio) {
+      this.getInstructions(ctx);
+    } else {
+      await ctx.scene.enter(BIO_SCENE);
+    }
   }
 
   async fillUserBio(@Ctx() ctx) {
@@ -24,72 +47,56 @@ export class UserProfileScene {
 
   async waitForReceiverInstructions(@Ctx() ctx) {
     const { language_code } = ctx.from;
-
+    const currentScene = USER_PROFILE_SCENE;
     await ctx.reply(
-      getTranslation(language_code, this.currentScene, 'WAIT'),
+      getTranslation(language_code, currentScene, 'WAIT'),
       waitKeyboard(
         getTranslation(
           language_code,
-          this.currentScene,
+          currentScene,
           'TELL_ABOUT_PROJECT_KEYBOARD',
         ),
         getTranslation(
           language_code,
-          this.currentScene,
+          currentScene,
           'WHO_IS_MY_RECEIVER_KEYBOARD',
         ),
-        getTranslation(language_code, this.currentScene, 'IDLE_KEYBOARD'),
+        getTranslation(language_code, currentScene, 'IDLE_KEYBOARD'),
       ),
     );
   }
 
-  @On('callback_query')
-  async onInlineKeyboard(@Ctx() ctx) {
-    const { queryType } = JSON.parse(ctx.update.callback_query.data);
-
-    if (queryType === 'FILL_PROFILE') {
-      await this.fillUserBio(ctx);
-    }
-    if (queryType === 'WAIT_FOR_RECEIVER') {
-      await this.waitForReceiverInstructions(ctx);
-    }
-    if (queryType === 'ABOUT_PROJECT') {
-      await this.getInstructions(ctx);
-    }
-    if (queryType === 'IDLE') {
-      await ctx.reply('👍');
-    }
-    if (queryType === RECEIVER_ATTACHED_SCENE) {
-      await ctx.scene.enter(RECEIVER_ATTACHED_SCENE);
-    }
-  }
-
-  //Пометить защитой, что уже было отправлено
-  @On('message')
-  async onUserBioSend(@Ctx() ctx) {
-    const { id } = ctx.from;
-    const { text } = ctx.update.message;
-    if (text.length === 0) {
-      await ctx.reply('Аноним значит. Ну ладно.');
-    } else {
-      await sendUserBioAPI(id, text);
-      await ctx.reply('Отправил!');
-    }
-    await this.getInstructions(ctx);
-  }
+  sendTimedMessage = async (message, ctx) => {
+    setTimeout(async () => {
+      await ctx.reply(message);
+    }, 2000);
+  };
 
   async getInstructions(@Ctx() ctx) {
+    const currentScene = USER_PROFILE_SCENE;
     const { language_code } = ctx.from;
     const INSTRUCTIONS = getTranslation(
       language_code,
-      this.currentScene,
+      currentScene,
       'INSTRUCTIONS',
     );
 
-    for await (const INSTRUCTION of INSTRUCTIONS) {
-      await ctx.reply(INSTRUCTION);
-    }
+    const len = INSTRUCTIONS.length;
 
+    await ctx.reply(INSTRUCTIONS[0]);
+    let pointer = 1;
+    const interval = setInterval(async () => {
+      await ctx.reply(INSTRUCTIONS[pointer]);
+      pointer++;
+
+      if (pointer === len) {
+        await this.sendFinalInstruction(ctx, language_code);
+        clearInterval(interval);
+      }
+    }, 2000);
+  }
+
+  sendFinalInstruction = async (ctx, language_code) => {
     await ctx.reply(
       getTranslation(language_code, this.currentScene, 'FINAL_INSTRUCTION'),
       instructionsKeyboard(
@@ -100,5 +107,5 @@ export class UserProfileScene {
         ),
       ),
     );
-  }
+  };
 }
