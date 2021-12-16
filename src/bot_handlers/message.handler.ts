@@ -10,7 +10,6 @@ import { TelegramUserRegistered } from 'common/guards/user-exists.guard';
 @Update()
 @UseFilters(TelegrafExceptionFilter)
 @UseGuards(TelegramUserRegistered)
-@UseGuards(MessageHandler)
 export class MessageHandler {
   constructor(
     @InjectBot(BOT_NAME)
