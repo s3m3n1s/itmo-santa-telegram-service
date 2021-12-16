@@ -3,7 +3,7 @@ import { Keyboard } from 'telegram-keyboard';
 
 export const aboutLanguageKeyboard = Keyboard.make([
   {
-    text: '🇷🇺',
+    text: 'ru',
     type: 'button',
     callback_data: JSON.stringify({
       queryType: 'ABOUT_LANGUAGE',
@@ -11,7 +11,7 @@ export const aboutLanguageKeyboard = Keyboard.make([
     }),
   },
   {
-    text: '🇬🇧',
+    text: 'en',
     type: 'button',
     callback_data: JSON.stringify({
       queryType: 'ABOUT_LANGUAGE',

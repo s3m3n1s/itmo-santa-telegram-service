@@ -25,9 +25,7 @@ export const getTranslation = (
 export const lang = {
   ru: {
     REGISTRATION_SCENE: {
-      START: `Вы можете поменять язык бота, изменив соответствующую настройку в клиенте Телеграма (Настройки -> Язык)
-
-You can change bot's language by selecting another language in Telegram settings (Settings -> Language)`,
+      START: `Choose your fighter: Тайный Санта or Secret Santa?`,
       START_KEYBOARD: 'Окей / Understood',
       AUTH_PHRASE:
         'А ты точно из ИТМО?\nНажми на кнопку, чтобы авторизироваться через ИСУ',
@@ -112,9 +110,7 @@ You can change bot's language by selecting another language in Telegram settings
   },
   en: {
     REGISTRATION_SCENE: {
-      START: `Вы можете поменять язык бота, изменив соответствующую настройку в клиенте Телеграма (Настройки -> Язык).
-
-You can change bot's language by selecting another language in Telegram settings (Settings -> Language)`,
+      START: `Choose your fighter: Тайный Санта or Secret Santa?`,
       START_KEYBOARD: 'Окей / Understood',
       AUTH_PHRASE: 'Are you definitely from ITMO?',
       AUTH_PHRASE_KEYBOARD: 'Auth with ISU',
