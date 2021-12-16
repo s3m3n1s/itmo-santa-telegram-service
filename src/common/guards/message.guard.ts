@@ -55,9 +55,9 @@ export class MessageGuard implements CanActivate {
       return true;
     }
 
-    throw new TelegrafException(
-      getTranslation(language_code, 'SUPPORT', 'FILL_IDLE'),
-    );
+    // throw new TelegrafException(
+    //   getTranslation(language_code, 'SUPPORT', 'FILL_IDLE'),
+    // );
 
     return true;
   }
