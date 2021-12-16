@@ -36,7 +36,7 @@ export class RegistrationScene {
     const { id } = ctx.from;
     const token = await generateAuthToken({
       tg_id: id,
-      language_code:lang,
+      language_code: lang,
     });
 
     const url = `${process.env.LINK_TO_REGISTRATION}&state=${token}`;
