@@ -1,12 +1,11 @@
 import { UseFilters, UseGuards } from '@nestjs/common';
-import { getUserAPI, getUserBioAPI } from 'api';
+import { getUserAPI } from 'api';
 import { BOT_NAME, REGISTRATION_SCENE } from 'app.constants';
 import { TelegrafExceptionFilter } from 'common/filters/telegraf-exception.filter';
 import { AlreadyRegisteredRegistered } from 'common/guards/already-registered';
 import { RegistrationExpiredGuard } from 'common/guards/registration-expired.guard';
 import { TelegramUserRegistered } from 'common/guards/user-exists.guard';
 
-import { authLinkKeyboard } from 'keyboards/registration';
 import { Command, Ctx, InjectBot, Start, Update } from 'nestjs-telegraf';
 import { Context, Telegraf } from 'telegraf';
 
@@ -39,12 +38,11 @@ export class CommandHandler {
   @Command('me')
   async getInfoAboutUser(@Ctx() ctx) {
     const { id } = ctx.from;
-    await ctx.reply('Вот что я знаю о тебе:');
     const user = await getUserAPI(id);
-    await ctx.reply('Пожелания и общая информация:');
-    await ctx.reply(user.bio || '<b>*Отсутствует*</b>', { parse_mode: 'HTML' });
-    await ctx.reply('Твоё письмо получателю подарка:');
-    await ctx.reply(user.letter || '<b>*Отсутствует*</b>', {
+    await ctx.reply('Пожелания и общая информация / Information about you');
+    await ctx.reply(user.bio || '<b>*no data*</b>', { parse_mode: 'HTML' });
+    await ctx.reply('Твоё письмо получателю подарка / Your letter');
+    await ctx.reply(user.letter || '<b>*no data*</b>', {
       parse_mode: 'HTML',
     });
   }
