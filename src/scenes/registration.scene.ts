@@ -36,7 +36,7 @@ export class RegistrationScene {
     const { id } = ctx.from;
     const token = await generateAuthToken({
       tg_id: id,
-      lang,
+      language_code:lang,
     });
 
     const url = `${process.env.LINK_TO_REGISTRATION}&state=${token}`;
@@ -57,6 +57,7 @@ export class RegistrationScene {
       await ctx.scene.enter(USER_PROFILE_SCENE);
     }
     if (queryType === 'ABOUT_LANGUAGE') {
+      await ctx.reply(lang);
       await this.authorization(ctx, lang);
     }
   }
