@@ -30,6 +30,7 @@ export class NotificationsService {
     try {
       await this.bot.telegram.sendMessage(receiver, `${message}`, {
         reply_markup: keyboard?.reply_markup,
+        parse_mode: 'MarkdownV2',
       });
     } catch (err) {
       console.log(err);
