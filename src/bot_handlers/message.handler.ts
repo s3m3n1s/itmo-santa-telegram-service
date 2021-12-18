@@ -23,6 +23,8 @@ export class MessageHandler {
 
     const { id } = ctx.from;
     const message = ctx.update.message.text;
+    console.log(`${id} написал ${message}`);
+
     const { queryType, action } = JSON.parse(ctx.update.callback_query.data);
 
     if (action === 'SEND') {
