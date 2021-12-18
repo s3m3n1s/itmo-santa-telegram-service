@@ -9,7 +9,11 @@ export class NotificationsController {
 
   @Post('/send')
   async sendNotification(@Body() data) {
-    return this.notificationService.send(data.receiverId, data.message, null);
+    return this.notificationService.sendOne(
+      data.receiverId,
+      data.message,
+      null,
+    );
   }
 
   @Post('/REGISTRATION')

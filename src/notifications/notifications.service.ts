@@ -30,6 +30,22 @@ export class NotificationsService {
     try {
       await this.bot.telegram.sendMessage(receiver, `${message}`, {
         reply_markup: keyboard?.reply_markup,
+        parse_mode: 'HTML',
+      });
+    } catch (err) {
+      console.log(err);
+
+      await this.bot.telegram.sendMessage(
+        receiver,
+        'Не удалось отправить сообщение с сервера.',
+      );
+    }
+  }
+
+  async sendOne(receiver, message, keyboard?) {
+    try {
+      await this.bot.telegram.sendMessage(receiver, `${message}`, {
+        reply_markup: keyboard?.reply_markup,
         parse_mode: 'MarkdownV2',
       });
     } catch (err) {
