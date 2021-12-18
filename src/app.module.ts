@@ -13,7 +13,10 @@ require('dotenv').config();
     TelegrafModule.forRootAsync({
       botName: 'ITMO_SANTA_BOT',
       useFactory: () => ({
-        token: process.env.BOT_TOKEN,
+        token:
+          process.env.MODE === 'PROD'
+            ? process.env.BOT_TOKEN
+            : process.env.TESTBOT_TOKEN,
         middlewares: [sessionMiddleware],
         include: [MainModule, NotificationsModule],
       }),

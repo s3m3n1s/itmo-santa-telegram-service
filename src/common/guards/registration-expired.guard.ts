@@ -12,9 +12,11 @@ export class RegistrationExpiredGuard implements CanActivate {
     const day = today.getDate();
     const hours = today.getHours();
 
-    throw new TelegrafException(
-      'Упс, регистрация в Тайном Санте уже завершена.',
-    );
+    if (day >= 19 && hours >= 18) {
+      throw new TelegrafException(
+        'Упс, регистрация в Тайном Санте уже завершена.',
+      );
+    }
 
     return true;
   }
