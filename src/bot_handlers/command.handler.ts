@@ -2,7 +2,7 @@ import { UseFilters, UseGuards } from '@nestjs/common';
 import { getUserAPI } from 'api';
 import { BOT_NAME, REGISTRATION_SCENE } from 'app.constants';
 import { TelegrafExceptionFilter } from 'common/filters/telegraf-exception.filter';
-import { AlreadyRegisteredRegistered } from 'common/guards/already-registered';
+import { AlreadyRegisteredUser } from 'common/guards/already-registered';
 import { RegistrationExpiredGuard } from 'common/guards/registration-expired.guard';
 import { TelegramUserRegistered } from 'common/guards/user-exists.guard';
 
@@ -10,7 +10,6 @@ import { Command, Ctx, InjectBot, Start, Update } from 'nestjs-telegraf';
 import { Context, Telegraf } from 'telegraf';
 
 @Update()
-@UseGuards(RegistrationExpiredGuard)
 @UseFilters(TelegrafExceptionFilter)
 export class CommandHandler {
   constructor(
@@ -18,7 +17,8 @@ export class CommandHandler {
     private readonly bot: Telegraf<Context>,
   ) {}
 
-  @UseGuards(AlreadyRegisteredRegistered)
+  @UseGuards(AlreadyRegisteredUser)
+  @UseGuards(RegistrationExpiredGuard)
   @Start()
   async startBot(@Ctx() ctx) {
     await ctx.scene.enter(REGISTRATION_SCENE);
@@ -47,6 +47,7 @@ export class CommandHandler {
     });
   }
 
+  @UseGuards(TelegramUserRegistered)
   @Command('mb2021')
   async markMbUsers(@Ctx() ctx) {
     const { id } = ctx.from;

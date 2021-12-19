@@ -2,11 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { getUserAPI } from 'api';
 import { REGISTRATION_SCENE } from 'app.constants';
 import { getTranslation } from 'language';
-import {
-  TelegrafExecutionContext,
-  TelegrafException,
-  Ctx,
-} from 'nestjs-telegraf';
+import { TelegrafExecutionContext, TelegrafException } from 'nestjs-telegraf';
 import { Context } from '../../interfaces/context.interface';
 
 @Injectable()
@@ -15,7 +11,7 @@ export class TelegramUserRegistered implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = TelegrafExecutionContext.create(context);
-    const { scene, from } = ctx.getContext<Context>();
+    const { from } = ctx.getContext<Context>();
     const { id, language_code } = from;
 
     const user = await getUserAPI(id);

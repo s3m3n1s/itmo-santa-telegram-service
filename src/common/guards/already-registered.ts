@@ -10,7 +10,7 @@ import {
 import { Context } from '../../interfaces/context.interface';
 
 @Injectable()
-export class AlreadyRegisteredRegistered implements CanActivate {
+export class AlreadyRegisteredUser implements CanActivate {
   private readonly ADMIN_IDS = [];
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
