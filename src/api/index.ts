@@ -91,7 +91,7 @@ export const updateUserProgressAPI = async (
 export const getUserGiftAPI = async (userId: string) => {
   try {
     const res = await axios.get(
-      `${process.env.REST_API}/gifts/getBy/tg_id/${userId}`,
+      `${process.env.REST_API}/gifts/getBy/creatorId/${userId}`,
     );
 
     console.log(`Запрошена информация о подарке юзера ${userId}`);
