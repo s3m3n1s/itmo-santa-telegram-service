@@ -16,6 +16,7 @@ import { instructionsKeyboard, waitKeyboard } from 'keyboards/user-profile';
 import { UserProfileScene } from 'scenes/user-profile.scene';
 import { reminderKeyboard } from 'keyboards/receiver-attached';
 import { getUserLanguage } from 'utils';
+import { Keyboard } from 'telegram-keyboard';
 
 @Update()
 @UseFilters(TelegrafExceptionFilter)
@@ -70,6 +71,9 @@ export class ManagerHandler {
     }
     if (queryType === 'OKAY') {
       await ctx.reply('😇');
+      if (language_code === 'ru') {
+        await this.getPromo(ctx);
+      }
     }
 
     if (queryType === GIFT_DELIVERED_SCENE) {
@@ -128,5 +132,20 @@ export class ManagerHandler {
         await this.notificationService.onMyGiftReceived(ctx);
         break;
     }
+  }
+
+  async getPromo(@Ctx() ctx) {
+    await ctx.reply(
+      'А еще, чтобы создать себе праздничное настроение на максимум, принимай участие в новогоднем челлендже #ITMOhohoho🎅\nВыполняй ежедневные задания из чек-листа и поборись за супер-набор от ИТМО!\nПереходи в наш Инстаграм для участия @itmoru 😎',
+      Keyboard.make([
+        {
+          text: 'Ого, звучит классно!',
+          type: 'button',
+          callback_data: JSON.stringify({
+            queryType: 'OK',
+          }),
+        },
+      ]).inline(),
+    );
   }
 }
