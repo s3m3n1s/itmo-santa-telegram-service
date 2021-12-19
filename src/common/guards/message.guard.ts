@@ -8,11 +8,7 @@ import {
 import { sendLetterKeyboard, sendBioKeyboard } from 'keyboards/message';
 import { getTranslation } from 'language';
 
-import {
-  TelegrafExecutionContext,
-  TelegrafException,
-  Ctx,
-} from 'nestjs-telegraf';
+import { TelegrafExecutionContext, Ctx } from 'nestjs-telegraf';
 import { getUserLanguage } from 'utils';
 import { Context } from '../../interfaces/context.interface';
 
@@ -54,10 +50,6 @@ export class MessageGuard implements CanActivate {
       );
       return true;
     }
-
-    // throw new TelegrafException(
-    //   getTranslation(language_code, 'SUPPORT', 'FILL_IDLE'),
-    // );
 
     return true;
   }

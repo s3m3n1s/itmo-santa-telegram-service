@@ -12,7 +12,7 @@ export const generateAuthToken = async (payload) => {
 export const getUserLanguage = async (userId) => {
   const user = await getUserAPI(userId);
   if (user) {
-    return user.language_code || 'en';
+    return user.language_code || 'ru';
   }
 };
 

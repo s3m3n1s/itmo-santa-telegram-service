@@ -4,7 +4,9 @@ import { TelegrafExceptionFilter } from '../common/filters/telegraf-exception.fi
 import {
   BIO_SCENE,
   BOT_NAME,
+  GIFT_DELIVERED_SCENE,
   LETTER_SCENE,
+  RECEIVER_ATTACHED_SCENE,
   USER_PROFILE_SCENE,
 } from 'app.constants';
 import { Context, Telegraf } from 'telegraf';
@@ -12,6 +14,8 @@ import { NotificationHandler } from './notification.handler';
 import { getTranslation } from 'language';
 import { instructionsKeyboard, waitKeyboard } from 'keyboards/user-profile';
 import { UserProfileScene } from 'scenes/user-profile.scene';
+import { reminderKeyboard } from 'keyboards/receiver-attached';
+import { getUserLanguage } from 'utils';
 
 @Update()
 @UseFilters(TelegrafExceptionFilter)
@@ -26,8 +30,9 @@ export class ManagerHandler {
   @On('callback_query')
   async onKeyboardActions(@Ctx() ctx) {
     const { id } = ctx.from;
+
     const { queryType, action } = JSON.parse(ctx.update.callback_query.data);
-    console.log(queryType, action);
+    const language_code = await getUserLanguage(id);
 
     if (action === 'SCENE') {
       await this.handleSceneCallback(queryType, id, ctx);
@@ -47,12 +52,40 @@ export class ManagerHandler {
       await this.userProfileService.waitForReceiverInstructions(ctx);
     }
 
+    if (queryType === 'WENT_FOR_GIFT') {
+      await ctx.reply(
+        getTranslation(
+          language_code,
+          RECEIVER_ATTACHED_SCENE,
+          'REMIND_ABOUT_LETTER',
+        ),
+        reminderKeyboard,
+      );
+    }
+    if (queryType === 'WILL_SEND_LETTER') {
+      await ctx.reply('Отправь его ответным сообщением');
+    }
+    if (queryType === 'WONT_SEND_GIFT') {
+      await ctx.reply('Понял принял подтвердил');
+    }
+    if (queryType === 'OKAY') {
+      await ctx.reply('😇');
+    }
+
+    if (queryType === GIFT_DELIVERED_SCENE) {
+      await ctx.scene.enter(GIFT_DELIVERED_SCENE);
+    }
+
     if (queryType === 'IDLE') {
       await ctx.reply('👍');
     }
 
     if (queryType === 'HOORAY') {
       await ctx.reply('🎉');
+    }
+
+    if (queryType === 'OK') {
+      await ctx.reply('🎅🏻');
     }
   }
 

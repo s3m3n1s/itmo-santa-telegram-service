@@ -1,5 +1,6 @@
 import { UseFilters } from '@nestjs/common';
 import { getUserBioAPI } from 'api';
+import { RECEIVER_ATTACHED_SCENE } from 'app.constants';
 import { TelegrafExceptionFilter } from 'common/filters/telegraf-exception.filter';
 import { Ctx, Update } from 'nestjs-telegraf';
 
@@ -15,8 +16,9 @@ export class NotificationHandler {
     const { id } = ctx.from;
     const userBio = await getUserBioAPI(id);
 
-    await ctx.reply(userBio);
+    ctx.scene.enter(RECEIVER_ATTACHED_SCENE);
   }
+
   async onGiftDelivered(@Ctx() ctx) {
     const { id } = ctx.from;
 

@@ -9,7 +9,7 @@ export const getUserAPI = async (userId: string | number) => {
     return res.data;
   } catch (err) {
     console.log(userId, err.response?.data);
-    return err.response.data;
+    return 'Error was occured while getting user info';
   }
 };
 
@@ -33,18 +33,17 @@ export const sendUserBioAPI = async (userId: string, bio: string) => {
 export const getUserBioAPI = async (userId: string) => {
   try {
     const gift = await axios.get(
-      `${process.env.REST_API}/gifts/getBy/receiverId/${userId}/`,
+      `${process.env.REST_API}/gifts/getBy/creatorId/${userId}/`,
     );
 
     const users = await axios.get(
-      `${process.env.REST_API}/users/get/${gift.data.creatorId}/`,
+      `${process.env.REST_API}/users/get/${gift.data.receiverId}/`,
     );
     const bio = users.data.bio;
     console.log(userId, 'получил пожелания от своего получателя');
     return bio;
   } catch (err) {
     console.log(userId, err.response?.data);
-    return err.response.data;
   }
 };
 
@@ -81,6 +80,21 @@ export const updateUserProgressAPI = async (
     );
 
     console.log(userId, ' перешёл на этап: ', progress);
+
+    return res.data;
+  } catch (err) {
+    console.log(userId, err.response?.data);
+    return err.response.data;
+  }
+};
+
+export const getUserGiftAPI = async (userId: string) => {
+  try {
+    const res = await axios.get(
+      `${process.env.REST_API}/gifts/getBy/tg_id/${userId}`,
+    );
+
+    console.log(`Запрошена информация о подарке юзера ${userId}`);
 
     return res.data;
   } catch (err) {

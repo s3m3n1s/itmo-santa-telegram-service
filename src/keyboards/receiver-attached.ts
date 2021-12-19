@@ -35,7 +35,7 @@ export const sendLetterKeyboard = Keyboard.make([
 
 export const reminderKeyboard = Keyboard.make([
   {
-    text: 'Окей',
+    text: 'Ok!',
     type: 'button',
     callback_data: JSON.stringify({ queryType: 'OKAY' }),
   },

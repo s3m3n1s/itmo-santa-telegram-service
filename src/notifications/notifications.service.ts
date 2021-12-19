@@ -26,9 +26,9 @@ export class NotificationsService {
     private readonly bot: Telegraf<Context>,
   ) {}
 
-  async send(receiver, message, keyboard?) {
+  async send(id, message, keyboard?) {
     try {
-      await this.bot.telegram.sendMessage(receiver, `${message}`, {
+      await this.bot.telegram.sendMessage(id, `${message}`, {
         reply_markup: keyboard?.reply_markup,
         parse_mode: 'HTML',
       });
@@ -36,15 +36,15 @@ export class NotificationsService {
       console.log(err);
 
       await this.bot.telegram.sendMessage(
-        receiver,
+        id,
         'Не удалось отправить сообщение с сервера.',
       );
     }
   }
 
-  async sendOne(receiver, message, keyboard?) {
+  async sendOne(id, message, keyboard?) {
     try {
-      await this.bot.telegram.sendMessage(receiver, `${message}`, {
+      await this.bot.telegram.sendMessage(id, `${message}`, {
         reply_markup: keyboard?.reply_markup,
         parse_mode: 'MarkdownV2',
       });
@@ -52,18 +52,18 @@ export class NotificationsService {
       console.log(err);
 
       await this.bot.telegram.sendMessage(
-        receiver,
+        id,
         'Не удалось отправить сообщение с сервера.',
       );
     }
   }
 
-  async onUserAuth({ receiverId, username = 'дорогой участник' }) {
-    await updateUserProgressAPI(receiverId, REGISTRATION_SCENE);
+  async onUserAuth({ id, username = 'дорогой участник' }) {
+    await updateUserProgressAPI(id, REGISTRATION_SCENE);
 
-    const language_code = await getUserLanguage(receiverId);
+    const language_code = await getUserLanguage(id);
     await this.send(
-      receiverId,
+      id,
       getTranslation(language_code, 'USER_PROFILE_SCENE', 'START')(username),
       onRegistrationKeyboard(
         getTranslation(
@@ -75,11 +75,11 @@ export class NotificationsService {
     );
   }
 
-  async onReceiverAttach({ receiverId }) {
-    await updateUserProgressAPI(receiverId, RECEIVER_ATTACHED_SCENE);
-    const language_code = await getUserLanguage(receiverId);
+  async onReceiverAttach({ id }) {
+    await updateUserProgressAPI(id, RECEIVER_ATTACHED_SCENE);
+    const language_code = await getUserLanguage(id);
     await this.send(
-      receiverId,
+      id,
       getTranslation(language_code, 'RECEIVER_ATTACHED_SCENE', 'START'),
       onReceivedAttachedKeyboard(
         getTranslation(
@@ -91,20 +91,20 @@ export class NotificationsService {
     );
   }
 
-  async onGiftDeliver({ receiverId }) {
-    await updateUserProgressAPI(receiverId, GIFT_DELIVERED_SCENE);
-    const language_code = await getUserLanguage(receiverId);
+  async onGiftDeliver({ id }) {
+    await updateUserProgressAPI(id, GIFT_DELIVERED_SCENE);
+    const language_code = await getUserLanguage(id);
     await this.send(
-      receiverId,
+      id,
       getTranslation(language_code, 'GIFT_DELIVERED_SCENE', 'START'),
       onGiftDeliveredKeyboard('🎁'),
     );
   }
 
-  async onMyGiftReceive({ receiverId }) {
-    const language_code = await getUserLanguage(receiverId);
+  async onMyGiftReceive({ id }) {
+    const language_code = await getUserLanguage(id);
     await this.send(
-      receiverId,
+      id,
       getTranslation(
         language_code,
         'GIFT_DELIVERED_SCENE',
@@ -114,10 +114,10 @@ export class NotificationsService {
     );
   }
 
-  async onGiftReceive({ receiverId }) {
-    const language_code = await getUserLanguage(receiverId);
+  async onGiftReceive({ id }) {
+    const language_code = await getUserLanguage(id);
     await this.send(
-      receiverId,
+      id,
       getTranslation(
         language_code,
         'GIFT_DELIVERED_SCENE',

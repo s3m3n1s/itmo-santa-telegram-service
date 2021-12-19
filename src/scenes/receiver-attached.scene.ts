@@ -1,16 +1,16 @@
-import { UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
-import { getUserBioAPI } from 'api';
-import { GIFT_DELIVERED_SCENE, RECEIVER_ATTACHED_SCENE } from 'app.constants';
+import { UseFilters, UseInterceptors } from '@nestjs/common';
+import { getUserBioAPI, getUserGiftAPI } from 'api';
+import { RECEIVER_ATTACHED_SCENE } from 'app.constants';
 import { TelegrafExceptionFilter } from 'common/filters/telegraf-exception.filter';
-import { TelegramUserRegistered } from 'common/guards/user-exists.guard';
 import { ResponseTimeInterceptor } from 'common/interceptors/response-time.interceptor';
 import {
   receiverAttachedKeyboard,
-  reminderKeyboard,
   sendLetterKeyboard,
 } from 'keyboards/receiver-attached';
-import { getTranslation, lang } from 'language';
-import { Ctx, On, Scene, SceneEnter } from 'nestjs-telegraf';
+import { getTranslation } from 'language';
+import { Ctx, On, Scene, SceneEnter, TelegrafException } from 'nestjs-telegraf';
+import { TelegramError } from 'telegraf';
+import { Keyboard } from 'telegram-keyboard';
 import { getUserLanguage } from 'utils';
 
 @UseInterceptors(ResponseTimeInterceptor)
@@ -21,6 +21,7 @@ export class ReceiverAttached {
   constructor() {
     this.currentScene = RECEIVER_ATTACHED_SCENE;
   }
+
   @SceneEnter()
   async onSceneEnter(@Ctx() ctx) {
     const { id } = ctx.from;
@@ -28,7 +29,11 @@ export class ReceiverAttached {
 
     const letter = await getUserBioAPI(id);
 
-    await ctx.reply(`"${letter}"`);
+    if (letter) {
+      await ctx.reply(`"${letter}"`);
+    } else {
+      await ctx.reply(`"no information"`);
+    }
 
     const INSTRUCTIONS = getTranslation(
       language_code,
@@ -36,10 +41,26 @@ export class ReceiverAttached {
       'INSTRUCTIONS',
     );
 
-    for await (const INSTRUCTION of INSTRUCTIONS) {
-      await ctx.reply(INSTRUCTION);
-    }
+    const len = INSTRUCTIONS.length;
 
+    let pointer = 0;
+    const interval = setInterval(async () => {
+      await ctx.reply(INSTRUCTIONS[pointer]);
+      pointer++;
+
+      if (pointer === len) {
+        clearInterval(interval);
+        await this.getFinalInstruction(ctx);
+        if (language_code === 'ru') {
+          await this.getPromo(ctx);
+        }
+      }
+    }, 2000);
+  }
+
+  async getFinalInstruction(@Ctx() ctx) {
+    const { id } = ctx.from;
+    const language_code = await getUserLanguage(id);
     const codeButtonText = getTranslation(
       language_code,
       this.currentScene,
@@ -53,50 +74,29 @@ export class ReceiverAttached {
       ),
     );
 
-    await ctx.reply(`${codeButtonText} ${8080}`, codeButtonKeyboard);
+    const gift = await getUserGiftAPI(id);
+
+    if (!gift.giftCode) {
+      await ctx.reply('gift code wasn`t found. Contact @partnadem');
+    }
+
+    await ctx.reply(`${codeButtonText} ${gift.giftCode}`);
+
+    await ctx.scene.leave();
   }
 
-  // @On('callback_query')
-  // async onInlineKeyboard(@Ctx() ctx) {
-  //   const { id, language_code } = ctx.from;
-  //   const { queryType } = JSON.parse(ctx.update.callback_query.data);
-
-  //   //перенести в start
-  //   if (queryType === 'WENT_FOR_GIFT') {
-  //     await ctx.reply(
-  //       getTranslation(language_code, this.currentScene, 'REMIND_ABOUT_LETTER'),
-  //       reminderKeyboard,
-  //     );
-  //   }
-  //   if (queryType === 'WILL_SEND_LETTER') {
-  //     await ctx.reply('Отправь его ответным сообщением');
-  //   }
-  //   if (queryType === 'WONT_SEND_GIFT') {
-  //     await ctx.reply('Понял принял подтвердил');
-  //   }
-  //   if (queryType === 'OKAY') {
-  //     await ctx.reply('😇');
-  //   }
-
-  //   if (queryType === GIFT_DELIVERED_SCENE) {
-  //     await ctx.scene.enter(GIFT_DELIVERED_SCENE);
-  //   }
-  // }
-
-  @On('message')
-  async onLetter(@Ctx() ctx) {
-    const { id } = ctx.from;
-    const language_code = await getUserLanguage(id);
-    //Проверка, что подарок был доставлен
-    await ctx.reply('Сохранил');
-  }
-
-  async remindAboutLetter(@Ctx() ctx) {
-    const { id } = ctx.from;
-    const language_code = await getUserLanguage(id);
+  async getPromo(@Ctx() ctx) {
     await ctx.reply(
-      'Как я и говорил ранее, ты можешь дополнить подарок digital-посланием! Участник получит твое послание, когда заберет предназначенный ему подарок.',
-      sendLetterKeyboard,
+      'А еще, чтобы создать себе праздничное настроение на максимум, принимай участие в новогоднем челлендже #ITMOhohoho🎅\nВыполняй ежедневные задания из чек-листа и поборись за супер-набор от ИТМО!\nПереходи в наш Инстаграм для участия @itmoru 😎',
+      Keyboard.make([
+        {
+          text: 'Ого, звучит классно!',
+          type: 'button',
+          callback_data: JSON.stringify({
+            queryType: 'OK',
+          }),
+        },
+      ]).inline(),
     );
   }
 }
