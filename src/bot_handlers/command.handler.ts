@@ -47,6 +47,15 @@ export class CommandHandler {
     });
   }
 
+  @Command('mb2021')
+  async markMbUsers(@Ctx() ctx) {
+    const { id } = ctx.from;
+    console.log(`/mb2021 ${id}`);
+    await ctx.reply('ТИНТ ТИНТ ТИНТ!');
+    await ctx.reply('Ваша заявка на участие в розыгрыше была принята!');
+    await ctx.reply('ТИНТ ТИНТ ТИНТ!');
+  }
+
   @Command('author')
   async getInformationAboutAuthor(@Ctx() ctx) {
     await ctx.reply(
