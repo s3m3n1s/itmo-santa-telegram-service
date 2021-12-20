@@ -39,7 +39,7 @@ export const lang = {
       ) => `Хо-хо-хо, привет, ${username}! Или лучше называть тебя Тайным Сантой?
 Ты стал участником самого масштабного обмена подарками в ИТМО! Давай скорее начнем наш круговорот приятностей. Ты готов подарить новогоднее настроение себе и ITMO Family?`,
       ARE_YOU_READY_KEYBOARD: `Готов!`,
-      SENT_BIO: 'Отправил!',
+      SENT_BIO: 'Сохранил!',
 
       TELL_ABOUT_YOURSELF: `Расскажи о себе!
 Может, ты заядлый геймер или на досуге вяжешь шапочки для котиков? А может, имбирные печеньки из ИКЕА твой guilty pleasure? В общем, напиши в ответном сообщении все, что стоит знать твоему Тайному Санте, прежде чем выбрать для тебя подарок.`,
@@ -120,7 +120,7 @@ export const lang = {
 You are now a part of ITMO’s biggest-ever gift exchange. Let’s get to the good stuff! Are you ready to bring some holiday joy to yourself and the rest of ITMO.FAMILY?
 `,
       ARE_YOU_READY_KEYBOARD: `Can’t wait!`,
-      SENT_BIO: 'Sent!',
+      SENT_BIO: 'Saved!',
       TELL_ABOUT_YOURSELF: `First, tell me a bit about yourself!
 Are you a die-hard gamer? Do you knit hats for cats? Maybe ginger cookies from IKEA are your true guilty pleasure? Just reply to me with all the things your own Secret Santa should know to choose the right gift for you.
 `,
