@@ -98,7 +98,7 @@ export class NotificationsService {
   }
 
   async onMyGiftDelivered({ id }) {
-    await updateUserProgressAPI(id, 'GIFT_WAS_RECEIVED');
+    await updateUserProgressAPI(id, 'MY_GIFT_DELIVERED');
     const language_code = await getUserLanguage(id);
 
     await this.send(
