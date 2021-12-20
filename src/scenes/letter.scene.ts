@@ -48,7 +48,9 @@ export class LetterScene {
     const language_code = await getUserLanguage(id);
     const { text } = ctx.update.message;
     await sendUserLetterAPI(id, text);
-    await ctx.reply('Отправил!');
+    await ctx.reply(
+      getTranslation(language_code, USER_PROFILE_SCENE, 'SENT_BIO'),
+    );
     await ctx.scene.leave();
   }
 }

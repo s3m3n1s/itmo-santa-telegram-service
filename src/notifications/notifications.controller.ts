@@ -33,6 +33,11 @@ export class NotificationsController {
     return this.notificationService.onGiftDeliver(data);
   }
 
+  @Post('/MY_GIFT_DELIVERED')
+  async onMyGiftDelivered(@Body() data) {
+    return this.notificationService.onMyGiftDelivered(data);
+  }
+
   @Post('/GIFT_RECEIVED')
   async onGiftReceive(@Body() data) {
     return this.notificationService.onGiftReceive(data);

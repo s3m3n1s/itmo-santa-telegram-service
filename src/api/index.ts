@@ -91,12 +91,30 @@ export const updateUserProgressAPI = async (
 export const getUserGiftAPI = async (userId: string) => {
   try {
     const res = await axios.get(
-      `${process.env.REST_API}/gifts/getBy/creatorId/${userId}`,
+      `${process.env.REST_API}/gifts/getBy/receiverId/${userId}`,
     );
 
     console.log(`Запрошена информация о подарке юзера ${userId}`);
 
     return res.data;
+  } catch (err) {
+    console.log(userId, err.response?.data);
+    return err.response.data;
+  }
+};
+
+export const getSantaLetterAPI = async (userId: string) => {
+  try {
+    const gift = await axios.get(
+      `${process.env.REST_API}/gifts/getBy/receiverId/${userId}`,
+    );
+
+    const user = await axios.get(
+      `${process.env.REST_API}/users/get/${gift.data.creatorId}/`,
+    );
+    const letter = user.data.letter;
+
+    return letter;
   } catch (err) {
     console.log(userId, err.response?.data);
     return err.response.data;

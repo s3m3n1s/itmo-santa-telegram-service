@@ -1,11 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { getUserAPI, updateUserProgressAPI } from 'api';
+import {
+  getSantaLetterAPI,
+  getUserAPI,
+  getUserGiftAPI,
+  updateUserProgressAPI,
+} from 'api';
 import {
   BOT_NAME,
   GIFT_DELIVERED_SCENE,
   RECEIVER_ATTACHED_SCENE,
   REGISTRATION_SCENE,
 } from 'app.constants';
+import { sendLetterKeyboard } from 'keyboards/message';
 
 import {
   onGiftDeliveredKeyboard,
@@ -91,12 +97,42 @@ export class NotificationsService {
     );
   }
 
+  async onMyGiftDelivered({ id }) {
+    await updateUserProgressAPI(id, 'GIFT_WAS_RECEIVED');
+    const language_code = await getUserLanguage(id);
+
+    await this.send(
+      id,
+      getTranslation(
+        language_code,
+        'RECEIVER_ATTACHED_SCENE',
+        'GIFT_WAS_DELIVERED',
+      ),
+    );
+
+    await this.send(
+      id,
+      getTranslation(
+        language_code,
+        'RECEIVER_ATTACHED_SCENE',
+        'REMIND_ABOUT_LETTER',
+      ),
+      sendLetterKeyboard('✅', '🚫'),
+    );
+  }
+
   async onGiftDeliver({ id }) {
     await updateUserProgressAPI(id, GIFT_DELIVERED_SCENE);
     const language_code = await getUserLanguage(id);
+    const { giftCode } = await getUserGiftAPI(id);
+
     await this.send(
       id,
-      getTranslation(language_code, 'GIFT_DELIVERED_SCENE', 'START'),
+      getTranslation(
+        language_code,
+        'GIFT_DELIVERED_SCENE',
+        'START',
+      )(giftCode || '<b>(no gift code. contact @partnadem)</b>'),
       onGiftDeliveredKeyboard('🎁'),
     );
   }
@@ -116,14 +152,27 @@ export class NotificationsService {
 
   async onGiftReceive({ id }) {
     const language_code = await getUserLanguage(id);
-    await this.send(
-      id,
-      getTranslation(
-        language_code,
-        'GIFT_DELIVERED_SCENE',
-        'GIFT_WAS_RECEIVED',
-      ),
-      onGiftReceivedKeyboard('✉️'),
-    );
+    const letter = await getSantaLetterAPI(id);
+
+    if (letter) {
+      await this.send(
+        id,
+        getTranslation(
+          language_code,
+          'GIFT_DELIVERED_SCENE',
+          'GIFT_WAS_RECEIVED',
+        ),
+        onGiftReceivedKeyboard('✉️'),
+      );
+    } else {
+      await this.send(
+        id,
+        getTranslation(
+          language_code,
+          'GIFT_DELIVERED_SCENE',
+          'GIFT_WAS_RECEIVED_NO_LETTER',
+        ),
+      );
+    }
   }
 }

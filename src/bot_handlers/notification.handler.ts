@@ -1,5 +1,5 @@
 import { UseFilters } from '@nestjs/common';
-import { getUserBioAPI } from 'api';
+import { getSantaLetterAPI, getUserBioAPI } from 'api';
 import { RECEIVER_ATTACHED_SCENE } from 'app.constants';
 import { TelegrafExceptionFilter } from 'common/filters/telegraf-exception.filter';
 import { Ctx, Update } from 'nestjs-telegraf';
@@ -27,8 +27,8 @@ export class NotificationHandler {
 
   async onGiftReceived(@Ctx() ctx) {
     const { id } = ctx.from;
-
-    await ctx.reply('user letter');
+    const letter = await getSantaLetterAPI(id);
+    await ctx.reply(letter);
   }
   async onMyGiftReceived(@Ctx() ctx) {
     const { id } = ctx.from;

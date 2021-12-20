@@ -77,15 +77,17 @@ export const lang = {
       REMING_ABOUT_DELIVER_KEYBOARD: 'Точно, спасибо, что напомнил!',
       GIFT_WAS_DELIVERED: `Вижу, ты принес подарок. Совсем скоро как минимум один участник нашего круговорота приятностей станет чуточку счастливее. Ведь он получит подарок от тебя!`,
       REMIND_ABOUT_LETTER:
-        'Кстати! Совсем забыл сказать. После того, как доставишь подарок на Ломоносова 9, ты сможешь отправить письмо получателю подарка. Участник получит твое послание, когда заберет предназначенный ему подарок.',
+        'Кстати! Совсем забыл сказать, ты можешь отправить письмо получателю подарка! Участник получит твое послание, когда заберет предназначенный ему подарок. Хочешь написать письмо получателю подарка?',
     },
     GIFT_DELIVERED_SCENE: {
-      START: `Хо-хо-хо, и снова привет, мой дорогой Тайный Санта! Настал самый приятный этап этой недели — период получения подарков. Твой подарок уже ждет тебя! Индивидуальный код для его получения — ******. Приходи в BIBLA ITMO на ул. Ломоносова, 9 (пятый этаж, ауд. 1505), 23 и 24 декабря с 9:00 до 21:00, называй эльфам индивидуальный код подарка для тебя и забирай свой кусочек новогоднего настроения.`,
+      START: (giftCode) =>
+        `Хо-хо-хо, и снова привет, мой дорогой Тайный Санта! Настал самый приятный этап этой недели — период получения подарков. Твой подарок уже ждет тебя! Индивидуальный код для его получения — ${giftCode} Приходи в BIBLA ITMO на ул. Ломоносова, 9 (пятый этаж, ауд. 1505), 23 и 24 декабря с 9:00 до 21:00, называй эльфам индивидуальный код подарка для тебя и забирай свой кусочек новогоднего настроения.`,
       START_KEYBOARD: `Ура! Пора отправляться на ломо.`,
       LETTER_RECEIVED: `У меня для тебя сюрприз! Меня тут один участник попросил передать сообщение для тебя`,
       LETTER_RECEIVED_KEYBOARD: `Как неожиданно и приятнооо`,
       REMIND_ABOUT_GIFT: `Твой подарок уже соскучился по тебе и мечтает попасть к тебе в руки. Скорее забери его в BIBLA ITMO на ул. Ломоносова, 9 (пятый этаж, ауд. 1505)— 24 декабря с 9:00 до 21:00. Не забудь назвать эльфам индивидуальный код подарка.`,
       GIFT_WAS_RECEIVED: `Поздравляю с получением подарка! Скорее посмотри, что для тебя приготовил твой личный Тайный Санта. Также ты можешь посмотреть письмо, которое оставил для тебя твой Тайный Санта. Нажми на кнопку ✉️`,
+      GIFT_WAS_RECEIVED_NO_LETTER: `Поздравляю с получением подарка! Скорее посмотри, что для тебя приготовил твой личный Тайный Санта!`,
       GIFT_WAS_RECEIVED_KEYBOARD: `❤️`,
       GIFT_RECEIVED: '',
       SEND_LETTER: 'Напиши письмо получателю подарка ответным сообщением: ',
@@ -152,19 +154,22 @@ Are you a die-hard gamer? Do you knit hats for cats? Maybe ginger cookies from I
       FINAL_INSTRUCTION_KEYBOARD: 'Got it! Buying gift, brb <3',
       REMIND_ABOUT_DELIVER: `Hi! The elves are waiting. We saved a spot for your gift. Don’t forget to drop by the library (5th floor, room 1505) at Lomonosova St. 9 before 9 PM on December 20!`,
       REMING_ABOUT_DELIVER_KEYBOARD: 'Thanks for the reminder!',
-      SEND_LETTER:
-        'Send message to chat and I will send it to the gift receiver.',
+
       GIFT_WAS_DELIVERED: `I see you’ve brought your gift. Very soon, at least one member of ITMO.FAMILY will become quite happy!`,
       REMIND_ABOUT_LETTER:
-        'By the way, you can add a digital message to your gift! Your gift buddy will receive your message once they’ve picked up their gift.',
+        'By the way, you can add a digital message to your gift! Your gift buddy will receive your message once they’ve picked up their gift. Do you want to add it?',
     },
     GIFT_DELIVERED_SCENE: {
-      START: `Ho-ho-ho! It’s me again! The nicest part is here: it’s time to open your gifts! Your present is already waiting for you. Here’s your number: ******. Come to the library (5th floor, room 1505) at Lomonosova St. 9 between 9 AM and 9 PM on December 23-24, tell your number to our elves, and pick up your own slice of holiday joy!`,
+      START: (giftCode) =>
+        `Ho-ho-ho! It’s me again! The nicest part is here: it’s time to open your gifts! Your present is already waiting for you. Here’s your number: ${giftCode}. Come to the library (5th floor, room 1505) at Lomonosova St. 9 between 9 AM and 9 PM on December 23-24, tell your number to our elves, and pick up your own slice of holiday joy!`,
       START_KEYBOARD: `Yoo-hoo! I’m off to Lomonosova!`,
       LETTER_RECEIVED: `I’ve got a surprise! There’s a message for you!`,
       LETTER_RECEIVED_KEYBOARD: `How nice!`,
+      SEND_LETTER:
+        'Send message to chat and I will send it to the gift receiver.',
       REMIND_ABOUT_GIFT: `Your gift is waiting for you! Hurry and pick it up at the library (5th floor, room 1505) at Lomonosova St. 9 between 9 AM and 9 PM on December 24. Don’t forget to tell my elves your gift number!`,
       GIFT_WAS_RECEIVED: `Congratulations on your gift! Quick, go and hurry up and open your present. Also you can press the button ✉️ and read message from your Secret Santa!`,
+      GIFT_WAS_RECEIVED_NO_LETTER: `Congratulations on your gift! Quick, go and hurry up and open your present!`,
       GIFT_WAS_RECEIVED_KEYBOARD: `❤️`,
       GIFT_RECEIVED: '',
       MY_GIFT_WAS_RECEIVED:
